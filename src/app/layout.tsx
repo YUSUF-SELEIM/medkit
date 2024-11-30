@@ -4,6 +4,7 @@ import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Header } from '@/components/header';
 import { Sidebar } from '@/components/sidebar';
+import { DataProvider } from '@/context/DataContext';  // Import the DataProvider
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -28,23 +29,26 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <div className="flex flex-col h-screen md:flex-row">
-            <Sidebar />
-            <div className="flex-1 flex flex-col overflow-hidden">
-              {/* Pass the routes array to the Header */}
-              <Header routes={routes} />
-              <main className="flex-1 overflow-x-hidden overflow-y-auto bg-background p-4">
-                {children}
-              </main>
+        {/* Wrap everything with DataProvider */}
+        <DataProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <div className="flex flex-col h-screen md:flex-row">
+              <Sidebar />
+              <div className="flex-1 flex flex-col overflow-hidden">
+                {/* Pass the routes array to the Header */}
+                <Header routes={routes} />
+                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-background p-4">
+                  {children}
+                </main>
+              </div>
             </div>
-          </div>
-        </ThemeProvider>
+          </ThemeProvider>
+        </DataProvider>
       </body>
     </html>
   );
