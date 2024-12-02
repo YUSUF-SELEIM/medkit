@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Patient {
+  id           String         @id @default(uuid())
+  name         String
+  email        String         @unique
+  password     String
+  DOB          DateTime
+  Prescription Prescription[]
+}
+
+model Pharmacist {
+  id           String         @id @default(uuid())
+  email        String         @unique
+  password     String
+  Prescription Prescription[]
+}
+
+model Admin {
+  id       String  @id @default(uuid())
+  email    String  @unique
+  password String
+  Order    Order[]
+}
+
+model Order {
+  order_id                String                    @id @default(uuid())
+  admin_id                String
+  Admin                   Admin                     @relation(fields: [admin_id], references: [id])
+  order_date              DateTime                  @default(now())
+  status                  String
+  Medication_Order_Detail Medication_Order_Detail[]
+}
+
+model Medication_Order_Detail {
+  order_id         String
+  Order            Order      @relation(fields: [order_id], references: [order_id])
+  med_id           String
+  Medication       Medication @relation(fields: [med_id], references: [med_id])
+  ordered_quantity Int
+
+  @@id([order_id, med_id])
+}
+
+model Prescription {
+  prescription_id         String                    @id @default(uuid())
+  patient_id              String
+  Patient                 Patient                   @relation(fields: [patient_id], references: [id])
+  pharmacist_id           String
+  Pharmacist              Pharmacist                @relation(fields: [pharmacist_id], references: [id])
+  issued_date             DateTime                  @default(now())
+  processed               Boolean                   @default(false)
+  Prescription_Medication Prescription_Medication[]
+}
+
+model Medication {
+  med_id                  String                    @id @default(uuid())
+  name                    String
+  supplier                String
+  price                   Decimal                   @db.Decimal(10, 2)
+  stock_quantity          Int
+  Prescription_Medication Prescription_Medication[]
+  Medication_Order_Detail Medication_Order_Detail[]
+}
+
+model Prescription_Medication {
+  prescription_id String
+  Prescription    Prescription @relation(fields: [prescription_id], references: [prescription_id])
+  med_id          String
+  Medication      Medication   @relation(fields: [med_id], references: [med_id])
+  quantity        Int
+
+  @@id([prescription_id, med_id])
+}
