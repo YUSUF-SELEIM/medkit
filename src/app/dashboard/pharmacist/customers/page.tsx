@@ -39,9 +39,7 @@ export default function CustomersPage() {
             <TableRow>
               <TableHead className="w-[100px]">ID</TableHead>
               <TableHead>Customer Name</TableHead>
-              <TableHead>Medication Purchased</TableHead>
-              <TableHead>Quantity</TableHead>
-              <TableHead>Total Price</TableHead>
+              <TableHead>Medication Details</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -50,9 +48,28 @@ export default function CustomersPage() {
               <TableRow key={customer.id}>
                 <TableCell className="font-medium">{customer.id}</TableCell>
                 <TableCell>{customer.customerName}</TableCell>
-                <TableCell>{customer.medicationPurchased}</TableCell>
-                <TableCell>{customer.quantity}</TableCell>
-                <TableCell>${customer.totalPrice.toFixed(2)}</TableCell>
+                <TableCell>
+                  <div className="rounded-md border overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Medication</TableHead>
+                          <TableHead>Quantity</TableHead>
+                          <TableHead>Total Price</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {customer.medications.map((medication, index) => (
+                          <TableRow key={index}>
+                            <TableCell>{medication.name}</TableCell>
+                            <TableCell>{medication.quantity}</TableCell>
+                            <TableCell>${medication.totalPrice.toFixed(2)}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end space-x-2">
                     <Button variant="outline" size="icon" onClick={() => handleDelete(customer.id)}>
