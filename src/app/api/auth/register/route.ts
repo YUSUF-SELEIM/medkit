@@ -36,8 +36,9 @@ export async function POST(req: NextRequest) {
 
     // Generate token
     const token = generateToken({
-      id: patient.id,
-      email: patient.email,
+        id: patient.id,
+        email: patient.email,
+        role: "patient",
     });
 
     return NextResponse.json(
