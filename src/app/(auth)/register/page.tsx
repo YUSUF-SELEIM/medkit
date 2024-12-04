@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { CalendarIcon, UserIcon } from 'lucide-react'
-import { format } from "date-fns"
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CalendarIcon, UserIcon } from "lucide-react";
+import { format } from "date-fns";
 
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Form,
   FormControl,
@@ -16,36 +16,75 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { patientSchema } from "@/lib/validations"
-import { cn } from "@/lib/utils"
-import { z } from "zod"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { PatientRegisterSchema } from "@/lib/validations";
+import { cn } from "@/lib/utils";
+import { z } from "zod";
+import Link from "next/link";
 
 function PatientRegisterForm() {
   const form = useForm({
-    resolver: zodResolver(patientSchema),
+    resolver: zodResolver(PatientRegisterSchema),
     defaultValues: {
       name: "",
       email: "",
       password: "",
       DOB: new Date(),
+      role: "patient", // Default role to 'patient'
     },
-  })
+  });
 
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  async function onSubmit(values: z.infer<typeof patientSchema>) {
-    setIsLoading(true)
-    // Here you would typically send the data to your backend
-    console.log(values)
-    setIsLoading(false)
+  // Function to check if the email belongs to a pharmacist
+  const getRoleFromEmail = (email: string) => {
+    return email.endsWith("@pharmacy") ? "pharmacist" : "patient";
+  };
+
+  async function onSubmit(values: z.infer<typeof PatientRegisterSchema>) {
+    setIsLoading(true);
+    setError("");
+    setSuccess("");
+
+
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Registration failed");
+      }
+
+      const data = await response.json();
+      setSuccess("Registration successful!");
+      console.log("User created:", data);
+    } catch (err) {
+      setError(err.message || "Something went wrong");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {error && <p className="text-red-500">{error}</p>}
+        {success && <p className="text-green-500">{success}</p>}
+
         <FormField
           control={form.control}
           name="name"
@@ -82,7 +121,8 @@ function PatientRegisterForm() {
                 <Input type="password" {...field} />
               </FormControl>
               <FormDescription>
-                Must be at least 8 characters long and contain uppercase, lowercase, number, and special character.
+                Must be at least 8 characters long and contain uppercase,
+                lowercase, number, and special character.
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -130,14 +170,18 @@ function PatientRegisterForm() {
           )}
         />
         <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading && (
-            <UserIcon className="mr-2 h-4 w-4 animate-spin" />
-          )}
+          {isLoading && <UserIcon className="mr-2 h-4 w-4 animate-spin" />}
           Register
         </Button>
       </form>
+      <Link
+        href="/login"
+        className="text-blue-500 hover:underline text-xs my-2"
+      >
+        Already have an account? Login here.
+      </Link>
     </Form>
-  )
+  );
 }
 
-export default PatientRegisterForm
+export default PatientRegisterForm;

@@ -15,25 +15,63 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { loginSchema } from "@/lib/validations";
+import { LoginSchema } from "@/lib/validations";
 import { z } from "zod";
+import Link from "next/link";
 
 function PatientLoginForm() {
   const form = useForm({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(LoginSchema),
     defaultValues: {
       email: "",
       password: "",
+      role: "patient", // default role is patient
     },
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  async function onSubmit(values: z.infer<typeof loginSchema>) {
+  async function onSubmit(values: z.infer<typeof LoginSchema>) {
     setIsLoading(true);
-    // Here you would typically send the data to your backend for authentication
-    console.log(values);
-    setIsLoading(false);
+    setErrorMessage("");
+
+    // Check if email ends with "@pharmacy" and update role to "pharmacist"
+    if (values.email.endsWith("@pharmacy.com")) {
+      values.role = "pharmacist";
+    }
+
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        setErrorMessage(errorData.error || "Something went wrong");
+        return;
+      }
+
+      const data = await response.json();
+
+      console.log("Login successful:", data);
+      // Handle successful login (e.g., save token to localStorage, redirect)
+      localStorage.setItem("token", data.token);
+      if (values.email.endsWith("@pharmacy.com")) {
+        window.location.href = "/dashboard/pharmacist";
+      } else {
+        window.location.href = "/dashboard/patient";
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
+      setErrorMessage("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -65,10 +103,17 @@ function PatientLoginForm() {
             </FormItem>
           )}
         />
+        {errorMessage && <p className="text-red-600 text-sm">{errorMessage}</p>}
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading && <UserIcon className="mr-2 h-4 w-4 animate-spin" />}
           Login
         </Button>
+        <Link
+          href="/register"
+          className=" text-blue-500 hover:underline text-xs my-2"
+        >
+          Don&apos;t have an account? Register here.
+        </Link>
       </form>
     </Form>
   );
