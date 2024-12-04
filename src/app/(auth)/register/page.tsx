@@ -44,11 +44,6 @@ function PatientRegisterForm() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Function to check if the email belongs to a pharmacist
-  const getRoleFromEmail = (email: string) => {
-    return email.endsWith("@pharmacy") ? "pharmacist" : "patient";
-  };
-
   async function onSubmit(values: z.infer<typeof PatientRegisterSchema>) {
     setIsLoading(true);
     setError("");
@@ -73,7 +68,7 @@ function PatientRegisterForm() {
       setSuccess("Registration successful!");
       console.log("User created:", data);
     } catch (err) {
-      setError(err.message || "Something went wrong");
+      setError((err as Error).message || "Something went wrong");
     } finally {
       setIsLoading(false);
     }
