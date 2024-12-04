@@ -1,8 +1,7 @@
-"use client";
+"use"
+import React, { createContext, useState, useContext, ReactNode } from "react";
 
-import React, { createContext, useState, useContext, useEffect, ReactNode } from "react";
-
-// Types for Inventory and Supplier
+// Define the types for Inventory, Customer, and Supplier
 type Inventory = {
   id: string;
   name: string;
@@ -13,72 +12,67 @@ type Inventory = {
   supplier: string;
 };
 
+type Customer = {
+  id: string;
+  customerName: string;
+  medicationPurchased: string;
+  quantity: number;
+  totalPrice: number;
+};
+
 type Supplier = {
   id: string;
   supplierName: string;
   contactNumber: string;
-  medications: { name: string; quantity: number }[];
+  medications: { name: string; quantity: number }[];  // Medications with quantities
   date: string;
 };
 
-// DataContext Type to hold functions and state for suppliers and inventory
+// Define the context type
 type DataContextType = {
   inventory: Inventory[];
+  customers: Customer[];
   suppliers: Supplier[];
   addInventory: (item: Inventory) => void;
+  addCustomer: (customer: Customer) => void;
   addSupplier: (supplier: Supplier) => void;
   deleteInventory: (id: string) => void;
+  deleteCustomer: (id: string) => void;
   deleteSupplier: (id: string) => void;
-  updateInventoryQuantity: (name: string, quantity: number) => void;
+  updateInventoryQuantity: (name: string, quantity: number) => void;  // Update inventory function
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
-// DataProvider Component
 export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [inventory, setInventory] = useState<Inventory[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
 
-  // Load data from localStorage on mount
-  useEffect(() => {
-    const savedInventory = localStorage.getItem("inventory");
-    const savedSuppliers = localStorage.getItem("suppliers");
-
-    if (savedInventory) {
-      setInventory(JSON.parse(savedInventory));
-    }
-    if (savedSuppliers) {
-      setSuppliers(JSON.parse(savedSuppliers));
-    }
-  }, []);
-
-  // Sync state changes with localStorage
-  useEffect(() => {
-    localStorage.setItem("inventory", JSON.stringify(inventory));
-    localStorage.setItem("suppliers", JSON.stringify(suppliers));
-  }, [inventory, suppliers]);
-
-  // Function to add inventory
   const addInventory = (item: Inventory) => {
     setInventory((prev) => [...prev, item]);
   };
 
-  // Function to add a new supplier
+  const addCustomer = (customer: Customer) => {
+    setCustomers((prev) => [...prev, customer]);
+  };
+
   const addSupplier = (supplier: Supplier) => {
     setSuppliers((prev) => [...prev, supplier]);
   };
 
-  // Function to delete inventory by ID
   const deleteInventory = (id: string) => {
     setInventory((prev) => prev.filter((item) => item.id !== id));
   };
 
-  // Function to delete supplier by ID
+  const deleteCustomer = (id: string) => {
+    setCustomers((prev) => prev.filter((customer) => customer.id !== id));
+  };
+
   const deleteSupplier = (id: string) => {
     setSuppliers((prev) => prev.filter((supplier) => supplier.id !== id));
   };
 
-  // Function to update inventory quantity based on medication name
   const updateInventoryQuantity = (name: string, quantity: number) => {
     setInventory((prev) =>
       prev.map((item) =>
@@ -93,12 +87,15 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     <DataContext.Provider
       value={{
         inventory,
+        customers,
         suppliers,
         addInventory,
+        addCustomer,
         addSupplier,
         deleteInventory,
+        deleteCustomer,
         deleteSupplier,
-        updateInventoryQuantity,
+        updateInventoryQuantity, // Provide the update function
       }}
     >
       {children}
@@ -106,8 +103,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// Custom hook to access the DataContext
-export const useDataContext = (): DataContextType => {
+export const useDataContext = () => {
   const context = useContext(DataContext);
   if (!context) {
     throw new Error("useDataContext must be used within a DataProvider");
