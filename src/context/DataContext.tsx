@@ -1,5 +1,4 @@
-"use client";
-
+"use"
 import React, { createContext, useState, useContext, ReactNode } from "react";
 
 // Define the types for Inventory, Customer, and Supplier
@@ -25,9 +24,8 @@ type Supplier = {
   id: string;
   supplierName: string;
   contactNumber: string;
-  medicationSupplied: string;
+  medications: { name: string; quantity: number }[];  // Medications with quantities
   date: string;
-  quantity: number;
 };
 
 // Define the context type
@@ -41,12 +39,11 @@ type DataContextType = {
   deleteInventory: (id: string) => void;
   deleteCustomer: (id: string) => void;
   deleteSupplier: (id: string) => void;
+  updateInventoryQuantity: (name: string, quantity: number) => void;  // Update inventory function
 };
 
-// Create the DataContext
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
-// DataProvider component that wraps around your application and provides state
 export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [inventory, setInventory] = useState<Inventory[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -76,6 +73,16 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     setSuppliers((prev) => prev.filter((supplier) => supplier.id !== id));
   };
 
+  const updateInventoryQuantity = (name: string, quantity: number) => {
+    setInventory((prev) =>
+      prev.map((item) =>
+        item.name === name
+          ? { ...item, quantity: item.quantity + quantity }
+          : item
+      )
+    );
+  };
+
   return (
     <DataContext.Provider
       value={{
@@ -88,6 +95,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         deleteInventory,
         deleteCustomer,
         deleteSupplier,
+        updateInventoryQuantity, // Provide the update function
       }}
     >
       {children}
@@ -95,7 +103,6 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// useDataContext hook to access the context
 export const useDataContext = () => {
   const context = useContext(DataContext);
   if (!context) {

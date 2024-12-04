@@ -1,64 +1,57 @@
-"use client"
+// InventoryPage.tsx
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import { Edit, Trash2 } from 'lucide-react'
-import { useDataContext } from '@/context/DataContext' // adjust the path accordingly
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Edit, Trash2 } from "lucide-react";
+import { useDataContext } from "@/context/DataContext";
 
 export default function InventoryPage() {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [isEditing, setIsEditing] = useState(false)
-  const [editItem, setEditItem] = useState<any>(null) // Holds the item being edited
-  const { inventory, deleteInventory, updateInventory } = useDataContext() // updateInventory function from context
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [editItem, setEditItem] = useState<any>(null); // Holds the item being edited
+  const { inventory, deleteInventory, updateInventory } = useDataContext(); // updateInventory function from context
 
-  const router = useRouter()
+  const router = useRouter();
 
   // Filter inventory based on search term
-  const filteredInventory = inventory.filter(item =>
+  const filteredInventory = inventory.filter((item) =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  );
 
-  // Handle delete action
   const handleDelete = (id: string) => {
-    deleteInventory(id)
-  }
+    deleteInventory(id);
+  };
 
-  // Handle edit action
   const handleEdit = (item: any) => {
-    setIsEditing(true)
-    setEditItem(item) // Set the item to be edited
-  }
+    setIsEditing(true);
+    setEditItem(item); // Set the item to be edited
+  };
 
-  // Handle save after edit
   const handleSave = () => {
     if (editItem) {
-      updateInventory(editItem) // Update the existing item in the context
-      setIsEditing(false)
-      setEditItem(null) // Clear the form
+      updateInventory(editItem); // Update the existing item in the context
+      setIsEditing(false);
+      setEditItem(null); // Clear the form
     }
-  }
+  };
 
-  // Handle changes in form
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
     setEditItem({
       ...editItem,
       [field]: e.target.value,
-    })
-  }
+    });
+  };
 
   return (
     <div className="space-y-4">
+              <h2 className="text-2xl font-bold">Inventory List</h2>
+
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+      
         <Input
           type="search"
           placeholder="Search medications..."
@@ -66,7 +59,9 @@ export default function InventoryPage() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <Button onClick={() => router.push('/dashboard/pharmacist/suppliers/add')}>Add Medication</Button>
+        <Button onClick={() => router.push("/dashboard/pharmacist/inventory/add")}>
+          Add Medication
+        </Button>
       </div>
 
       {/* Edit Form Modal */}
@@ -79,37 +74,37 @@ export default function InventoryPage() {
                 type="text"
                 placeholder="Name"
                 value={editItem.name}
-                onChange={(e) => handleChange(e, 'name')}
+                onChange={(e) => handleChange(e, "name")}
               />
               <Input
                 type="number"
                 placeholder="Quantity"
                 value={editItem.quantity}
-                onChange={(e) => handleChange(e, 'quantity')}
+                onChange={(e) => handleChange(e, "quantity")}
               />
               <Input
                 type="number"
                 placeholder="Price"
                 value={editItem.price}
-                onChange={(e) => handleChange(e, 'price')}
+                onChange={(e) => handleChange(e, "price")}
               />
               <Input
                 type="text"
                 placeholder="Status"
                 value={editItem.status}
-                onChange={(e) => handleChange(e, 'status')}
+                onChange={(e) => handleChange(e, "status")}
               />
               <Input
                 type="date"
                 placeholder="Expiration"
                 value={editItem.expiration}
-                onChange={(e) => handleChange(e, 'expiration')}
+                onChange={(e) => handleChange(e, "expiration")}
               />
               <Input
                 type="text"
                 placeholder="Supplier"
                 value={editItem.supplier}
-                onChange={(e) => handleChange(e, 'supplier')}
+                onChange={(e) => handleChange(e, "supplier")}
               />
             </div>
             <div className="flex gap-2 mt-4">
@@ -142,21 +137,28 @@ export default function InventoryPage() {
                 <TableCell className="font-medium">{item.id}</TableCell>
                 <TableCell>{item.name}</TableCell>
                 <TableCell>{item.quantity}</TableCell>
-                <TableCell>${item.price.toFixed(2)}</TableCell>
-                <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs ${item.status === 'In Stock' ? 'bg-green-300 text-black' : 'bg-yellow-300 text-black'}`}>
-                    {item.status}
-                  </span>
-                </TableCell>
+                <TableCell>{item.price}</TableCell>
+                <TableCell>{item.status}</TableCell>
                 <TableCell>{item.expiration}</TableCell>
                 <TableCell>{item.supplier}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end space-x-2">
-                    <Button variant="outline" size="icon" onClick={() => handleEdit(item)}>
-                      <Edit className="h-4 w-4 text-yellow-400" />
+                    <Button
+                      onClick={() => handleEdit(item)}
+                      variant="outline"
+                      size="sm"
+                    >
+                      <Edit className="mr-2 h-4 w-4" />
+                      Edit
                     </Button>
-                    <Button variant="outline" size="icon" onClick={() => handleDelete(item.id)}>
-                      <Trash2 className="h-4 w-4 text-red-600" />
+                    <Button
+                      onClick={() => handleDelete(item.id)}
+                      variant="outline"
+                      className="text-red-600"
+                      size="sm"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Delete
                     </Button>
                   </div>
                 </TableCell>
@@ -166,5 +168,5 @@ export default function InventoryPage() {
         </Table>
       </div>
     </div>
-  )
+  );
 }
