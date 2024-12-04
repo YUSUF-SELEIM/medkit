@@ -13,7 +13,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Edit, Trash2 } from 'lucide-react'
-import { useDataContext } from '../../../src/context/DataContext' // adjust the path accordingly
+import { useDataContext } from '@/context/DataContext' // adjust the path accordingly
 
 export default function InventoryPage() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -66,7 +66,7 @@ export default function InventoryPage() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <Button onClick={() => router.push('/inventory/add')}>Add Medication</Button>
+        <Button onClick={() => router.push('/dashboard/pharmacist/inventory/add')}>Add Medication</Button>
       </div>
 
       {/* Edit Form Modal */}

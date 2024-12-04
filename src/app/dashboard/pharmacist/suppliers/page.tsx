@@ -32,7 +32,7 @@ export default function SuppliersPage() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Supplier List</h2>
-        <Button onClick={() => router.push('/suppliers/add')}>
+        <Button onClick={() => router.push('/dashboard/pharmacist/suppliers/add')}>
           <PlusCircle className="mr-2 h-4 w-4" />
           Add New Supplier
         </Button>

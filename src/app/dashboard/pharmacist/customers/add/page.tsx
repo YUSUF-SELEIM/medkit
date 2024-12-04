@@ -12,7 +12,7 @@ import {
   SelectItem,
   SelectValue,
 } from '@/components/ui/select'
-import { useDataContext } from '../../../context/DataContext'
+import { useDataContext } from '@/context/DataContext'
 
 const medicationsList = ['Aspirin', 'Paracetamol', 'Ibuprofen', 'Amoxicillin']
 
