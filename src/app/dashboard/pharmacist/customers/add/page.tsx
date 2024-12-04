@@ -12,20 +12,38 @@ import {
   SelectItem,
   SelectValue,
 } from '@/components/ui/select'
+import { useDataContext } from '@/context/DataContext'
 
 const medicationsList = ['Aspirin', 'Paracetamol', 'Ibuprofen', 'Amoxicillin']
 
 export default function AddCustomerPage() {
+  const { addCustomer } = useDataContext() // Use context to add customer
   const router = useRouter()
+  
   const [customer, setCustomer] = useState({
-    name: '',
-    medications: [{ name: '', quantity: '' }], // Array for multiple medications
+    customerName: '',
+    medications: [{ name: '', quantity: '' }],
   })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('New customer:', customer)
-    router.push('/customers')
+
+    // Calculate total price based on quantity (assumed a simple price lookup, modify as needed)
+    const totalPrice = customer.medications.reduce((total, medication) => {
+      const price = getMedicationPrice(medication.name) // Implement this function based on your needs
+      return total + price * Number(medication.quantity)
+    }, 0)
+
+    const newCustomer = {
+      ...customer,
+      totalPrice, // Add totalPrice to the customer object
+    }
+
+    // Add customer to context
+    addCustomer(newCustomer)
+
+    // Redirect to customer list page
+    router.push('/dashboard/pharmacist/customers')
   }
 
   const handleChange = (index: number, field: string, value: string) => {
@@ -46,6 +64,21 @@ export default function AddCustomerPage() {
     setCustomer({ ...customer, medications: updatedMedications })
   }
 
+  const getMedicationPrice = (medication: string) => {
+    switch (medication) {
+      case 'Aspirin':
+        return 5
+      case 'Paracetamol':
+        return 3
+      case 'Ibuprofen':
+        return 4
+      case 'Amoxicillin':
+        return 8
+      default:
+        return 0
+    }
+  }
+
   return (
     <div className="p-4 md:p-6 max-w-xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Add New Customer</h1>
@@ -55,8 +88,8 @@ export default function AddCustomerPage() {
           <Input
             id="name"
             name="name"
-            value={customer.name}
-            onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
+            value={customer.customerName}
+            onChange={(e) => setCustomer({ ...customer, customerName: e.target.value })}
             required
           />
         </div>

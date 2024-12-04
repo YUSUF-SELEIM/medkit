@@ -12,9 +12,11 @@ import {
   SelectItem,
   SelectValue,
 } from '@/components/ui/select'
+import { useDataContext } from '@/context/DataContext' // Import the context
 
 export default function AddMedicationPage() {
-  const router = useRouter()
+  const { addInventory } = useDataContext(); // Get the addInventory function from the context
+  const router = useRouter();
   const [medication, setMedication] = useState({
     name: '',
     quantity: '',
@@ -22,18 +24,26 @@ export default function AddMedicationPage() {
     expiration: '',
     supplier: '',
     status: '', // New field for stock status
-  })
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Here you would typically send the data to your backend
-    console.log('New medication:', medication)
-    router.push('/inventory')
-  }
+    e.preventDefault();
+    // Create a new inventory item
+    const newMedication = {
+      id: Math.random().toString(36).substring(7), // Generate a unique ID for the new item
+      ...medication,
+      quantity: Number(medication.quantity), // Ensure quantity is a number
+      price: Number(medication.price), // Ensure price is a number
+    };
+    // Add new medication to the inventory
+    addInventory(newMedication);
+    console.log('New medication:', newMedication);
+    router.push('/dashboard/pharmacist/inventory'); // Redirect to inventory page
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMedication({ ...medication, [e.target.name]: e.target.value })
-  }
+    setMedication({ ...medication, [e.target.name]: e.target.value });
+  };
 
   return (
     <div className="p-4 md:p-6 max-w-xl mx-auto">
