@@ -50,8 +50,8 @@ export function Header() {
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() => {
-                localStorage.removeItem("token"); 
-                window.location.href = "/"; 
+                localStorage.removeItem("token");
+                window.location.href = "/";
               }}
             >
               <LogOut className="mr-2 h-4 w-4" />
