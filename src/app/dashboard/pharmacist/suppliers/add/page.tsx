@@ -7,12 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useDataContext } from "@/context/DataContext"; // Correct import
 
-type Medication = {
-  name: string;
-  quantity: number;
-};
-
-export default function AddSupplierPage() {
+export default function SupplierManagement() {
   const router = useRouter();
   const { addSupplier } = useDataContext(); // Access the context's addSupplier function
   const [supplier, setSupplier] = useState({
@@ -23,7 +18,10 @@ export default function AddSupplierPage() {
   });
 
   // Handle changes to supplier fields
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>, index?: number) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index?: number
+  ) => {
     const { name, value } = e.target;
     if (name === "medication_name" && index !== undefined) {
       const updatedMedications = [...supplier.medications];
@@ -48,7 +46,9 @@ export default function AddSupplierPage() {
 
   // Handle removing a medication input field
   const handleRemoveMedication = (index: number) => {
-    const updatedMedications = supplier.medications.filter((_, i) => i !== index);
+    const updatedMedications = supplier.medications.filter(
+      (_, i) => i !== index
+    );
     setSupplier({ ...supplier, medications: updatedMedications });
   };
 
@@ -92,7 +92,9 @@ export default function AddSupplierPage() {
           {supplier.medications.map((medication, index) => (
             <div key={index} className="space-y-2">
               <div>
-                <Label htmlFor={`medication_name_${index}`}>Medication Name</Label>
+                <Label htmlFor={`medication_name_${index}`}>
+                  Medication Name
+                </Label>
                 <Input
                   id={`medication_name_${index}`}
                   name="medication_name"
