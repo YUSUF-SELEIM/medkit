@@ -58,7 +58,7 @@ export default function AddSupplierPage() {
     const newSupplier = { id: Date.now().toString(), ...supplier };
     addSupplier(newSupplier); // Add the new supplier to the context
     console.log("New supplier:", newSupplier);
-    router.push("/suppliers"); // Navigate back to the suppliers page after adding
+    router.push("/dashboard/pharmacist/suppliers"); // Navigate back to the suppliers page after adding
   };
 
   return (

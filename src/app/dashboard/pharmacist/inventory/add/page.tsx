@@ -38,7 +38,7 @@ export default function AddMedicationPage() {
     // Add new medication to the inventory
     addInventory(newMedication);
     console.log('New medication:', newMedication);
-    router.push('/inventory'); // Redirect to inventory page
+    router.push('/dashboard/pharmacist/inventory'); // Redirect to inventory page
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -43,7 +43,7 @@ export default function AddCustomerPage() {
     addCustomer(newCustomer)
 
     // Redirect to customer list page
-    router.push('/customers')
+    router.push('/dashboard/pharmacist/customers')
   }
 
   const handleChange = (index: number, field: string, value: string) => {

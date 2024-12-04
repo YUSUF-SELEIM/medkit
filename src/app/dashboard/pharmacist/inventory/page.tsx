@@ -66,7 +66,7 @@ export default function InventoryPage() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <Button onClick={() => router.push('/dashboard/pharmacist/inventory/add')}>Add Medication</Button>
+        <Button onClick={() => router.push('/dashboard/pharmacist/suppliers/add')}>Add Medication</Button>
       </div>
 
       {/* Edit Form Modal */}
