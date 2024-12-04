@@ -1,6 +1,7 @@
 "use client"
 
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -10,17 +11,24 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Input } from '@/components/ui/input' // Import your Input component
 import { PlusCircle, Trash2 } from 'lucide-react'
 import { useDataContext } from '@/context/DataContext' // Adjust the import as per your structure
 
 export default function CustomersPage() {
   const { customers, deleteCustomer } = useDataContext()
+  const [searchQuery, setSearchQuery] = useState('')
   const router = useRouter()
 
   // Handle delete action
   const handleDelete = (id: string) => {
     deleteCustomer(id)
   }
+
+  // Filter customers by search query
+  const filteredCustomers = customers.filter((customer) =>
+    customer.customerName.toLowerCase().includes(searchQuery.toLowerCase())
+  )
 
   return (
     <div className="space-y-4">
@@ -30,6 +38,15 @@ export default function CustomersPage() {
           <PlusCircle className="mr-2 h-4 w-4" />
           Add New Customer
         </Button>
+      </div>
+      <div>
+        <Input
+          type="text"
+          placeholder="Search customers..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full sm:max-w-xs"
+        />
       </div>
       <div className="rounded-md border overflow-x-auto">
         <Table>
@@ -43,7 +60,7 @@ export default function CustomersPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {customers.map((customer) => {
+            {filteredCustomers.map((customer) => {
               // Calculate the total price for all medications
               const totalPrice = customer.medications.reduce(
                 (sum, medication) => sum + parseFloat(medication.totalPrice || 0),
