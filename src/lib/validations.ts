@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const patientSchema = z.object({
+export const PatientRegisterSchema = z.object({
   name: z
     .string()
     .min(2, { message: "Name must be at least 2 characters long" }),
@@ -16,14 +16,11 @@ export const patientSchema = z.object({
       }
     ),
   DOB: z
-    .date({ required_error: "Date of Birth is required" })
-    .max(new Date(), { message: "Date of Birth cannot be in the future" })
-    .min(new Date(1900, 0, 1), {
-      message: "Date of Birth is too far in the past",
-    }),
+    .union([z.string(), z.date()])
+    .transform((val) => (typeof val === "string" ? new Date(val) : val)),
 });
 
-export const loginSchema = z.object({
+export const LoginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
   password: z
     .string()
@@ -35,4 +32,7 @@ export const loginSchema = z.object({
           "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
       }
     ),
+  role: z.enum(["patient", "pharmacist"], {
+    required_error: "Role is required",
+  }),
 });
