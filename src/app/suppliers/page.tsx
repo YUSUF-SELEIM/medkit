@@ -12,25 +12,21 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Check, X, PlusCircle } from 'lucide-react'
+import { useDataContext } from '@/context/DataContext' // Import useDataContext
 
 export default function SuppliersPage() {
-  const [suppliers, setSuppliers] = useState([
-    { id: 1, name: 'PharmaCo', contact: '123-456-7890', medication: 'Paracetamol', date: '2023-12-01', quantity: 1000 },
-    { id: 2, name: 'MediSupply', contact: '987-654-3210', medication: 'Ibuprofen', date: '2023-12-05', quantity: 500 },
-    // Add more sample data as needed
-  ])
-
-  const handleAccept = (id: number) => {
-    // Logic to accept supply and update inventory
-    setSuppliers(suppliers.filter(supplier => supplier.id !== id))
-  }
-
-  const handleReject = (id: number) => {
-    // Logic to reject supply
-    setSuppliers(suppliers.filter(supplier => supplier.id !== id))
-  }
-
+  const { suppliers, deleteSupplier } = useDataContext() // Access suppliers and deleteSupplier from context
   const router = useRouter()
+
+  const handleAccept = (id: string) => {
+    // Logic to accept supply and update inventory
+    deleteSupplier(id) // Remove the supplier from context
+  }
+
+  const handleReject = (id: string) => {
+    // Logic to reject supply
+    deleteSupplier(id) // Remove the supplier from context
+  }
 
   return (
     <div className="space-y-4">
@@ -48,9 +44,8 @@ export default function SuppliersPage() {
               <TableHead className="w-[100px]">ID</TableHead>
               <TableHead>Supplier Name</TableHead>
               <TableHead>Contact Number</TableHead>
-              <TableHead>Medication Supplied</TableHead>
+              <TableHead>Medications Supplied</TableHead>
               <TableHead>Date</TableHead>
-              <TableHead>Quantity</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -60,9 +55,31 @@ export default function SuppliersPage() {
                 <TableCell className="font-medium">{supplier.id}</TableCell>
                 <TableCell>{supplier.name}</TableCell>
                 <TableCell>{supplier.contact}</TableCell>
-                <TableCell>{supplier.medication}</TableCell>
-                <TableCell>{supplier.date}</TableCell>
-                <TableCell>{supplier.quantity}</TableCell>
+                
+                {/* Small Medications Sub-table */}
+                <TableCell>
+                  <div className="overflow-x-auto max-w-xs">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Medication</TableHead>
+                          <TableHead>Quantity</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {supplier.medications.map((medication, index) => (
+                          <TableRow key={index}>
+                            <TableCell>{medication.name}</TableCell>
+                            <TableCell>{medication.quantity}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </TableCell>
+
+                <TableCell>{supplier.supply_date}</TableCell>
+
                 <TableCell className="text-right">
                   <div className="flex justify-end space-x-2">
                     <Button onClick={() => handleAccept(supplier.id)} variant="outline" className='text-green-600' size="sm">
@@ -83,4 +100,3 @@ export default function SuppliersPage() {
     </div>
   )
 }
-

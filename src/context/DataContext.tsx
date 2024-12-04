@@ -2,6 +2,7 @@
 
 import React, { createContext, useState, useContext, ReactNode } from "react";
 
+// Define the types for Inventory, Customer, and Supplier
 type Inventory = {
   id: string;
   name: string;
@@ -29,6 +30,7 @@ type Supplier = {
   quantity: number;
 };
 
+// Define the context type
 type DataContextType = {
   inventory: Inventory[];
   customers: Customer[];
@@ -41,8 +43,10 @@ type DataContextType = {
   deleteSupplier: (id: string) => void;
 };
 
+// Create the DataContext
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
+// DataProvider component that wraps around your application and provides state
 export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [inventory, setInventory] = useState<Inventory[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -91,6 +95,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
+// useDataContext hook to access the context
 export const useDataContext = () => {
   const context = useContext(DataContext);
   if (!context) {
