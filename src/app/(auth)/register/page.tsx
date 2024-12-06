@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarIcon, UserIcon } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,7 @@ import { PatientRegisterSchema } from "@/lib/validations";
 import { cn } from "@/lib/utils";
 import { z } from "zod";
 import Link from "next/link";
+import { Spinner } from "@/components/ui/spinner";
 
 function PatientRegisterForm() {
   const form = useForm({
@@ -48,7 +49,6 @@ function PatientRegisterForm() {
     setIsLoading(true);
     setError("");
     setSuccess("");
-
 
     try {
       const response = await fetch("/api/auth/register", {
@@ -165,7 +165,7 @@ function PatientRegisterForm() {
           )}
         />
         <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading && <UserIcon className="mr-2 h-4 w-4 animate-spin" />}
+          {isLoading && <Spinner className="mr-2 h-4 w-4 animate-spin" />}
           Register
         </Button>
       </form>
