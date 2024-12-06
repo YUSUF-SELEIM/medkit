@@ -51,6 +51,7 @@ model Prescription {
   pharmacist_id           String
   processed               Boolean                   @default(false)
   issue_date              DateTime                  @default(now())
+  end_date                DateTime
   Patient                 Patient                   @relation(fields: [patient_id], references: [id])
   Pharmacist              Pharmacist                @relation(fields: [pharmacist_id], references: [id])
   Prescription_Medication Prescription_Medication[]
@@ -69,6 +70,7 @@ model Medication {
 model Prescription_Medication {
   prescription_id String
   med_id          String
+  dosage          String
   quantity        Int
   Medication      Medication   @relation(fields: [med_id], references: [med_id])
   Prescription    Prescription @relation(fields: [prescription_id], references: [prescription_id])
