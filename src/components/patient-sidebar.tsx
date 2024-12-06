@@ -22,16 +22,16 @@ export function PatientSidebar({
   setActiveTab,
 }: PatientSidebarProps) {
   const menuItems = [
-    { id: "prescriptions", label: "Current Prescriptions", icon: Pill },
-    { id: "history", label: "Medication History", icon: Clock },
-    { id: "appointments", label: "Upcoming Appointments", icon: Calendar },
-    { id: "metrics", label: "Health Metrics", icon: Activity },
+    { id: "Prescriptions", label: "Current Prescriptions", icon: Pill },
+    { id: "History", label: "Medication History", icon: Clock },
+    { id: "Pending", label: "Pending Prescriptions", icon: Calendar },
+    { id: "Metrics", label: "Health Metrics", icon: Activity },
   ];
 
   return (
     <Sidebar className="w-64 border-r">
       <SidebarHeader className="p-4 border-b">
-        <h2 className="text-2xl font-bold">Pharmacist</h2>
+        <h2 className="text-2xl font-bold">Patient</h2>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
