@@ -5,7 +5,7 @@ import { PharmacistSidebar } from "@/components/pharmacist-sidebar";
 import { PharmacyDashboardMetrics } from "@/components/pharmacy-dashboard-metrics";
 import InventoryManagement from "@/components/inventory-management";
 import SupplierManagement from "@/components/supplier-management";
-import CustomerManagement from "@/components/customer-management";
+import PrescriptionsManagement from "@/components/prescription-management";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 function PharmacistDashboard() {
@@ -19,7 +19,7 @@ function PharmacistDashboard() {
           <main className="flex-1 p-6">
             {activeTab === "dashboard" && <PharmacyDashboardMetrics />}
             {activeTab === "inventory" && <InventoryManagement />}
-            {activeTab === "customers" && <CustomerManagement />}
+            {activeTab === "prescriptions" && <PrescriptionsManagement />}
             {activeTab === "suppliers" && <SupplierManagement />}
           </main>
         </SidebarInset>
