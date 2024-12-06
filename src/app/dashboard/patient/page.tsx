@@ -4,15 +4,12 @@ import { useState } from "react";
 import { PatientSidebar } from "@/components/patient-sidebar";
 import { CurrentPrescriptions } from "@/components/current-prescriptions";
 import { MedicationHistory } from "@/components/medication-history";
-import { UpcomingAppointments } from "@/components/upcoming-appointments";
+import { PendingPrescriptions } from "@/components/pending-prescriptions";
 import { HealthMetrics } from "@/components/health-metrics";
-import {
-  SidebarInset,
-  SidebarProvider,
-} from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 function PatientDashboard() {
-  const [activeTab, setActiveTab] = useState("prescriptions");
+  const [activeTab, setActiveTab] = useState("Prescriptions");
 
   return (
     <SidebarProvider>
@@ -20,10 +17,10 @@ function PatientDashboard() {
         <PatientSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         <SidebarInset className="flex-1">
           <main className="flex-1 p-6">
-            {activeTab === "prescriptions" && <CurrentPrescriptions />}
-            {activeTab === "history" && <MedicationHistory />}
-            {activeTab === "appointments" && <UpcomingAppointments />}
-            {activeTab === "metrics" && <HealthMetrics />}
+            {activeTab === "Prescriptions" && <CurrentPrescriptions />}
+            {activeTab === "History" && <MedicationHistory />}
+            {activeTab === "Pending" && <PendingPrescriptions />}
+            {activeTab === "Metrics" && <HealthMetrics />}
           </main>
         </SidebarInset>
       </div>
