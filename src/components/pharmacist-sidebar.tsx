@@ -26,7 +26,7 @@ export function PharmacistSidebar({
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: Home },
     { id: "inventory", label: "Inventory", icon: Package },
-    { id: "customers", label: "Customers", icon: Users },
+    { id: "prescriptions", label: "Prescriptions Management", icon: Users },
     { id: "suppliers", label: "Suppliers", icon: Truck },
   ];
 
