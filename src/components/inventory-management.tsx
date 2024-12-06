@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -16,130 +16,178 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { Edit, Trash2, Plus } from "lucide-react";
+import { Edit, Trash2, Plus, ShoppingCart } from "lucide-react";
 
-type InventoryItem = {
-  id: string;
+type Medication = {
+  med_id: string;
   name: string;
-  quantity: number;
-  price: number;
-  status: string;
-  expiration: string;
   supplier: string;
+  price: number;
+  stock_quantity: number;
 };
 
-type InventoryManagementProps = {
-  initialInventory?: InventoryItem[];
-  onAddInventory?: (item: InventoryItem) => void;
-  onUpdateInventory?: (item: InventoryItem) => void;
-  onDeleteInventory?: (id: string) => void;
-};
-
-export default function InventoryManagement({
-  initialInventory = [],
-  onAddInventory,
-  onUpdateInventory,
-  onDeleteInventory,
-}: InventoryManagementProps) {
-  const [inventory, setInventory] = useState<InventoryItem[]>(initialInventory);
+export default function MedicationManagement() {
+  const [medications, setMedications] = useState<Medication[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [isAdding, setIsAdding] = useState(false);
-  const [editItem, setEditItem] = useState<InventoryItem | null>(null);
-  const [newItem, setNewItem] = useState({
+  const [isRequesting, setIsRequesting] = useState(false);
+  const [editMedication, setEditMedication] = useState<Medication | null>(null);
+  const [requestMedication, setRequestMedication] = useState({
     name: "",
-    quantity: "",
-    price: "",
-    status: "In Stock",
-    expiration: "",
     supplier: "",
+    price: "",
+    stock_quantity: "",
   });
 
-  // Filter inventory based on search term
-  const filteredInventory = inventory.filter((item) =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  // Fetch medications on component mount
+  useEffect(() => {
+    const fetchMedications = async () => {
+      try {
+        const response = await fetch("/api/medications");
+        const data = await response.json();
+        setMedications(data);
+      } catch (error) {
+        console.error("Failed to fetch medications:", error);
+      }
+    };
+
+    fetchMedications();
+  }, []);
+
+  // Filter medications based on search term
+  const filteredMedications = medications.filter((med) =>
+    med.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Handle delete action
-  const handleDelete = (id: string) => {
-    const updatedInventory = inventory.filter((item) => item.id !== id);
-    setInventory(updatedInventory);
-    onDeleteInventory?.(id);
-  };
-
-  // Handle edit action
-  const handleEdit = (item: InventoryItem) => {
-    setIsEditing(true);
-    setEditItem(item);
-  };
-
-  // Handle save after edit
-  const handleSave = () => {
-    if (editItem) {
-      const updatedInventory = inventory.map((item) =>
-        item.id === editItem.id ? editItem : item
-      );
-      setInventory(updatedInventory);
-      onUpdateInventory?.(editItem);
-      setIsEditing(false);
-      setEditItem(null);
+  const handleDelete = async (med_id: string) => {
+    try {
+      const response = await fetch(`/api/medications/${med_id}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        setMedications(medications.filter((med) => med.med_id !== med_id));
+      }
+    } catch (error) {
+      console.error("Failed to delete medication:", error);
     }
   };
 
-  // Handle add new item
-  const handleAdd = () => {
-    const itemToAdd = {
-      ...newItem,
-      id: `ID-${Date.now()}`, // Generate a temporary ID
-      quantity: Number(newItem.quantity),
-      price: Number(newItem.price),
-    } as InventoryItem;
+  // New method to increase stock for a specific medication
+  const handleIncreaseStock = async (
+    medication: Medication,
+    increaseAmount: number = 10
+  ) => {
+    try {
+      const updatedMedication = {
+        ...medication,
+        stock_quantity: medication.stock_quantity + increaseAmount,
+      };
 
-    const updatedInventory = [...inventory, itemToAdd];
-    setInventory(updatedInventory);
-    onAddInventory?.(itemToAdd);
+      const response = await fetch(`/api/medications/${medication.med_id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedMedication),
+      });
 
-    // Reset new item form
-    setNewItem({
-      name: "",
-      quantity: "",
-      price: "",
-      status: "In Stock",
-      expiration: "",
-      supplier: "",
-    });
-    setIsAdding(false);
+      if (response.ok) {
+        const updatedMedications = medications.map((med) =>
+          med.med_id === medication.med_id ? updatedMedication : med
+        );
+        setMedications(updatedMedications);
+      }
+    } catch (error) {
+      console.error("Failed to increase medication stock:", error);
+    }
   };
 
-  // Handle changes in edit form
+  // Rest of the existing methods remain the same...
+  const handleEdit = (medication: Medication) => {
+    setIsEditing(true);
+    setEditMedication(medication);
+  };
+
+  const handleSave = async () => {
+    if (editMedication) {
+      try {
+        const response = await fetch(
+          `/api/medications/${editMedication.med_id}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(editMedication),
+          }
+        );
+
+        if (response.ok) {
+          const updatedMedications = medications.map((med) =>
+            med.med_id === editMedication.med_id ? editMedication : med
+          );
+          setMedications(updatedMedications);
+          setIsEditing(false);
+          setEditMedication(null);
+        }
+      } catch (error) {
+        console.error("Failed to update medication:", error);
+      }
+    }
+  };
+
+  const handleRequest = async () => {
+    try {
+      const response = await fetch("/api/medications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...requestMedication,
+          price: Number(requestMedication.price),
+          stock_quantity: Number(requestMedication.stock_quantity),
+        }),
+      });
+
+      if (response.ok) {
+        const newMedication = await response.json();
+        setMedications([...medications, newMedication]);
+        setIsRequesting(false);
+        setRequestMedication({
+          name: "",
+          supplier: "",
+          price: "",
+          stock_quantity: "",
+        });
+      }
+    } catch (error) {
+      console.error("Failed to request medication:", error);
+    }
+  };
+
   const handleEditChange = (
     e: React.ChangeEvent<HTMLInputElement>,
-    field: keyof InventoryItem
+    field: keyof Medication
   ) => {
-    if (editItem) {
-      setEditItem({
-        ...editItem,
+    if (editMedication) {
+      setEditMedication({
+        ...editMedication,
         [field]: e.target.value,
       });
     }
   };
 
-  // Handle changes in add form
-  const handleAddChange = (
+  const handleRequestChange = (
     e: React.ChangeEvent<HTMLInputElement>,
-    field: keyof InventoryItem
+    field: keyof Omit<Medication, "med_id">
   ) => {
-    setNewItem({
-      ...newItem,
+    setRequestMedication({
+      ...requestMedication,
       [field]: e.target.value,
     });
   };
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+      {/* Existing search and request button code remains the same */}
+      <div className="flex justify-between items-center">
         <Input
           type="search"
           placeholder="Search medications..."
@@ -147,174 +195,142 @@ export default function InventoryManagement({
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <Dialog open={isAdding} onOpenChange={setIsAdding}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" /> Add Medication
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New Medication</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-3">
-              <Input
-                type="text"
-                placeholder="Name"
-                value={newItem.name}
-                onChange={(e) => handleAddChange(e, "name")}
-              />
-              <Input
-                type="number"
-                placeholder="Quantity"
-                value={newItem.quantity}
-                onChange={(e) => handleAddChange(e, "quantity")}
-              />
-              <Input
-                type="number"
-                placeholder="Price"
-                value={newItem.price}
-                onChange={(e) => handleAddChange(e, "price")}
-              />
-              <Input
-                type="text"
-                placeholder="Status"
-                value={newItem.status}
-                onChange={(e) => handleAddChange(e, "status")}
-              />
-              <Input
-                type="date"
-                placeholder="Expiration"
-                value={newItem.expiration}
-                onChange={(e) => handleAddChange(e, "expiration")}
-              />
-              <Input
-                type="text"
-                placeholder="Supplier"
-                value={newItem.supplier}
-                onChange={(e) => handleAddChange(e, "supplier")}
-              />
-            </div>
-            <div className="flex gap-2 mt-4">
-              <Button onClick={handleAdd}>Add</Button>
-              <Button variant="outline" onClick={() => setIsAdding(false)}>
-                Cancel
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <Button onClick={() => setIsRequesting(true)}>
+          <Plus className="mr-2 h-4 w-4" /> Request Medication
+        </Button>
       </div>
 
-      {/* Edit Item Dialog */}
-      <Dialog
-        open={isEditing}
-        onOpenChange={(open) => {
-          if (!open) {
-            setIsEditing(false);
-            setEditItem(null);
-          }
-        }}
-      >
+      {/* Request Medication Dialog remains the same */}
+      <Dialog open={isRequesting} onOpenChange={setIsRequesting}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Medication</DialogTitle>
+            <DialogTitle>Request New Medication</DialogTitle>
           </DialogHeader>
-          {editItem && (
-            <div className="space-y-3">
-              <Input
-                type="text"
-                placeholder="Name"
-                value={editItem.name}
-                onChange={(e) => handleEditChange(e, "name")}
-              />
-              <Input
-                type="number"
-                placeholder="Quantity"
-                value={editItem.quantity}
-                onChange={(e) => handleEditChange(e, "quantity")}
-              />
-              <Input
-                type="number"
-                placeholder="Price"
-                value={editItem.price}
-                onChange={(e) => handleEditChange(e, "price")}
-              />
-              <Input
-                type="text"
-                placeholder="Status"
-                value={editItem.status}
-                onChange={(e) => handleEditChange(e, "status")}
-              />
-              <Input
-                type="date"
-                placeholder="Expiration"
-                value={editItem.expiration}
-                onChange={(e) => handleEditChange(e, "expiration")}
-              />
-              <Input
-                type="text"
-                placeholder="Supplier"
-                value={editItem.supplier}
-                onChange={(e) => handleEditChange(e, "supplier")}
-              />
-              <div className="flex gap-2 mt-4">
-                <Button onClick={handleSave}>Save</Button>
-                <Button variant="outline" onClick={() => setIsEditing(false)}>
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          )}
+          <div className="space-y-3">
+            <Input
+              type="text"
+              placeholder="Name"
+              value={requestMedication.name}
+              onChange={(e) => handleRequestChange(e, "name")}
+            />
+            <Input
+              type="text"
+              placeholder="Supplier"
+              value={requestMedication.supplier}
+              onChange={(e) => handleRequestChange(e, "supplier")}
+            />
+            <Input
+              type="number"
+              placeholder="Price"
+              value={requestMedication.price}
+              onChange={(e) => handleRequestChange(e, "price")}
+            />
+            <Input
+              type="number"
+              placeholder="Stock Quantity"
+              value={requestMedication.stock_quantity}
+              onChange={(e) => handleRequestChange(e, "stock_quantity")}
+            />
+          </div>
+          <div className="flex gap-2 mt-4">
+            <Button onClick={handleRequest}>Request</Button>
+            <Button variant="outline" onClick={() => setIsRequesting(false)}>
+              Cancel
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
 
+      {/* Existing Edit section remains the same */}
+      {isEditing && editMedication && (
+        <div className="border p-4 rounded-md space-y-3">
+          <h3 className="text-lg font-semibold">Edit Medication</h3>
+          <Input
+            type="text"
+            placeholder="Name"
+            value={editMedication.name}
+            onChange={(e) => handleEditChange(e, "name")}
+          />
+          <Input
+            type="text"
+            placeholder="Supplier"
+            value={editMedication.supplier}
+            onChange={(e) => handleEditChange(e, "supplier")}
+          />
+          <Input
+            type="number"
+            placeholder="Price"
+            value={editMedication.price}
+            onChange={(e) => handleEditChange(e, "price")}
+          />
+          <Input
+            type="number"
+            placeholder="Stock Quantity"
+            value={editMedication.stock_quantity}
+            onChange={(e) => handleEditChange(e, "stock_quantity")}
+          />
+          <div className="flex gap-2">
+            <Button onClick={handleSave}>Save</Button>
+            <Button variant="outline" onClick={() => setIsEditing(false)}>
+              Cancel
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Updated Table with Request Stock button */}
       <div className="rounded-md border overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead className="w-[100px]">ID</TableHead>
               <TableHead>Name</TableHead>
-              <TableHead>Quantity</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Expiration</TableHead>
               <TableHead>Supplier</TableHead>
+              <TableHead>Price</TableHead>
+              <TableHead>Stock Quantity</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredInventory.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell className="font-medium">{item.id}</TableCell>
-                <TableCell>{item.name}</TableCell>
-                <TableCell>{item.quantity}</TableCell>
-                <TableCell>${item.price.toFixed(2)}</TableCell>
+            {filteredMedications.map((medication) => (
+              <TableRow key={medication.med_id}>
+                <TableCell className="font-medium">
+                  {medication.med_id}
+                </TableCell>
+                <TableCell>{medication.name}</TableCell>
+                <TableCell>{medication.supplier}</TableCell>
+                <TableCell>${medication.price}</TableCell>
                 <TableCell>
                   <span
                     className={`px-2 py-1 rounded-full text-xs ${
-                      item.status === "In Stock"
+                      medication.stock_quantity > 0
                         ? "bg-green-300 text-black"
-                        : "bg-yellow-300 text-black"
+                        : "bg-red-300 text-black"
                     }`}
                   >
-                    {item.status}
+                    {medication.stock_quantity}
                   </span>
                 </TableCell>
-                <TableCell>{item.expiration}</TableCell>
-                <TableCell>{item.supplier}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end space-x-2">
                     <Button
                       variant="outline"
                       size="icon"
-                      onClick={() => handleEdit(item)}
+                      onClick={() => handleIncreaseStock(medication)}
+                    >
+                      <ShoppingCart className="h-4 w-4 text-blue-600" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleEdit(medication)}
                     >
                       <Edit className="h-4 w-4 text-yellow-400" />
                     </Button>
                     <Button
                       variant="outline"
                       size="icon"
-                      onClick={() => handleDelete(item.id)}
+                      onClick={() => handleDelete(medication.med_id)}
                     >
                       <Trash2 className="h-4 w-4 text-red-600" />
                     </Button>
