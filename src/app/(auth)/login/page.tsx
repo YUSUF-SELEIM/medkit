@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UserIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { LoginSchema } from "@/lib/validations";
 import { z } from "zod";
 import Link from "next/link";
+import { Spinner } from "@/components/ui/spinner";
 
 function PatientLoginForm() {
   const form = useForm({
@@ -31,6 +31,24 @@ function PatientLoginForm() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  async function generateInitialPrescription(id: string) {
+    try {
+      const prescriptionResponse = await fetch("/api/prescriptions/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
+      });
+
+      if (!prescriptionResponse.ok) {
+        console.warn("Failed to generate initial prescription");
+      }
+    } catch (error) {
+      console.error("Error generating initial prescription:", error);
+    }
+  }
 
   async function onSubmit(values: z.infer<typeof LoginSchema>) {
     setIsLoading(true);
@@ -59,11 +77,13 @@ function PatientLoginForm() {
       const data = await response.json();
 
       console.log("Login successful:", data);
-      // Handle successful login (e.g., save token to localStorage, redirect)
       localStorage.setItem("token", data.token);
+
       if (values.email.endsWith("@pharmacy.com")) {
         window.location.href = "/dashboard/pharmacist";
       } else {
+        // For patients, generate initial prescription
+        await generateInitialPrescription(data.user.id);
         window.location.href = "/dashboard/patient";
       }
     } catch (error) {
@@ -105,7 +125,7 @@ function PatientLoginForm() {
         />
         {errorMessage && <p className="text-red-600 text-sm">{errorMessage}</p>}
         <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading && <UserIcon className="mr-2 h-4 w-4 animate-spin" />}
+          {isLoading && <Spinner className="mr-2 h-4 w-4 animate-spin" />}
           Login
         </Button>
         <Link
