@@ -4,7 +4,7 @@ import { useState } from "react";
 import { PharmacistSidebar } from "@/components/pharmacist-sidebar";
 import { PharmacyDashboardMetrics } from "@/components/pharmacy-dashboard-metrics";
 import InventoryManagement from "@/components/inventory-management";
-import SupplierManagement from "@/components/supplier-management";
+import OrdersManagement from "@/components/order-management";
 import PrescriptionsManagement from "@/components/prescription-management";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
@@ -20,7 +20,7 @@ function PharmacistDashboard() {
             {activeTab === "dashboard" && <PharmacyDashboardMetrics />}
             {activeTab === "inventory" && <InventoryManagement />}
             {activeTab === "prescriptions" && <PrescriptionsManagement />}
-            {activeTab === "suppliers" && <SupplierManagement />}
+            {activeTab === "orders" && <OrdersManagement />}
           </main>
         </SidebarInset>
       </div>
