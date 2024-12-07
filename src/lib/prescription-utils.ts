@@ -35,7 +35,10 @@ export async function generateRandomPrescription(patientId: string) {
   // Create prescription
   const prescription = await prisma.prescription.create({
     data: {
-      end_date: new Date(new Date().getTime() + (Math.floor(Math.random() * (90 - 7 + 1)) + 7) * 24 * 60 * 60 * 1000), // Random number of days between 7 and 90
+      end_date: new Date(
+        new Date().getTime() +
+          (Math.floor(Math.random() * (90 - 7 + 1)) + 7) * 24 * 60 * 60 * 1000
+      ), // Random number of days between 7 and 90
       patient_id: patientId,
       pharmacist_id: randomPharmacist.id,
       Prescription_Medication: {
