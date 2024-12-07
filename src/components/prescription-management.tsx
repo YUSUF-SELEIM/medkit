@@ -17,7 +17,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle } from "lucide-react";
+import { PillBottleIcon } from "lucide-react";
+import { Spinner } from "./ui/spinner";
 
 interface Medication {
   med_id: string;
@@ -39,6 +40,8 @@ export default function PrescriptionsManagement() {
   const [selectedPrescription, setSelectedPrescription] =
     useState<Prescription | null>(null);
   const [isProcessingDialog, setIsProcessingDialog] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAccepting, setIsAccepting] = useState(true);
 
   // Fetch pending prescriptions
   const fetchPendingPrescriptions = async () => {
@@ -49,12 +52,14 @@ export default function PrescriptionsManagement() {
       }
       const data = await response.json();
       setPrescriptions(data);
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Could not fetch pending prescriptions",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -78,7 +83,7 @@ export default function PrescriptionsManagement() {
         throw new Error("Failed to process prescription");
       }
 
-      const result = await response.json();
+      await response.json();
 
       // Update local state
       setPrescriptions(
@@ -95,12 +100,14 @@ export default function PrescriptionsManagement() {
 
       setIsProcessingDialog(false);
       setSelectedPrescription(null);
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Could not process prescription",
         variant: "destructive",
       });
+    } finally {
+      setIsAccepting(false);
     }
   };
 
@@ -138,7 +145,7 @@ export default function PrescriptionsManagement() {
 
       setIsProcessingDialog(false);
       setSelectedPrescription(null);
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Could not reject prescription",
@@ -151,6 +158,10 @@ export default function PrescriptionsManagement() {
   useEffect(() => {
     fetchPendingPrescriptions();
   }, []);
+
+  if (isLoading) {
+    return <Spinner className="h-20 w-20 mx-auto mt-52" />;
+  }
 
   return (
     <div className="space-y-4">
@@ -197,6 +208,14 @@ export default function PrescriptionsManagement() {
             ))}
           </TableBody>
         </Table>
+        {prescriptions.length === 0 && (
+          <div className="flex my-12 space-y-4 flex-col items-center justify-center w-full">
+            <PillBottleIcon className="h-24 w-24" />
+            <p className="text-lg font-semibold text-gray-600">
+              No Pending Prescriptions
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Prescription Processing Dialog */}
@@ -240,13 +259,16 @@ export default function PrescriptionsManagement() {
                   onClick={handleAcceptPrescription}
                   className="bg-green-500 hover:bg-green-600"
                 >
-                  <CheckCircle className="mr-2 h-5 w-5" /> Accept
+                  {isAccepting && (
+                    <Spinner className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Accept
                 </Button>
                 <Button
                   onClick={handleRejectPrescription}
                   variant="destructive"
                 >
-                  <XCircle className="mr-2 h-5 w-5" /> Reject
+                  Reject
                 </Button>
               </div>
             </div>
