@@ -17,7 +17,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Edit, Trash2, Plus, ShoppingCart } from "lucide-react";
+import { Edit, Trash2, Plus } from "lucide-react";
+import { Spinner } from "./ui/spinner";
 
 type Medication = {
   med_id: string;
@@ -39,6 +40,7 @@ export default function MedicationManagement() {
     price: "",
     stock_quantity: "",
   });
+  const [isLoading, setIsLoading] = useState(true);
 
   // Fetch medications on component mount
   useEffect(() => {
@@ -49,6 +51,8 @@ export default function MedicationManagement() {
         setMedications(data);
       } catch (error) {
         console.error("Failed to fetch medications:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -71,34 +75,6 @@ export default function MedicationManagement() {
       }
     } catch (error) {
       console.error("Failed to delete medication:", error);
-    }
-  };
-
-  // New method to increase stock for a specific medication
-  const handleIncreaseStock = async (
-    medication: Medication,
-    increaseAmount: number = 10
-  ) => {
-    try {
-      const updatedMedication = {
-        ...medication,
-        stock_quantity: medication.stock_quantity + increaseAmount,
-      };
-
-      const response = await fetch(`/api/medications/${medication.med_id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedMedication),
-      });
-
-      if (response.ok) {
-        const updatedMedications = medications.map((med) =>
-          med.med_id === medication.med_id ? updatedMedication : med
-        );
-        setMedications(updatedMedications);
-      }
-    } catch (error) {
-      console.error("Failed to increase medication stock:", error);
     }
   };
 
@@ -142,7 +118,7 @@ export default function MedicationManagement() {
         body: JSON.stringify({
           ...requestMedication,
           price: Number(requestMedication.price),
-          stock_quantity: Number(requestMedication.stock_quantity),
+          stock_quantity: 0,
         }),
       });
 
@@ -184,6 +160,9 @@ export default function MedicationManagement() {
     });
   };
 
+  if (isLoading) {
+    return <Spinner className="h-20 w-20 mx-auto mt-52" />;
+  }
   return (
     <div className="space-y-4">
       {/* Existing search and request button code remains the same */}
@@ -225,12 +204,6 @@ export default function MedicationManagement() {
               value={requestMedication.price}
               onChange={(e) => handleRequestChange(e, "price")}
             />
-            <Input
-              type="number"
-              placeholder="Stock Quantity"
-              value={requestMedication.stock_quantity}
-              onChange={(e) => handleRequestChange(e, "stock_quantity")}
-            />
           </div>
           <div className="flex gap-2 mt-4">
             <Button onClick={handleRequest}>Request</Button>
@@ -262,12 +235,6 @@ export default function MedicationManagement() {
             placeholder="Price"
             value={editMedication.price}
             onChange={(e) => handleEditChange(e, "price")}
-          />
-          <Input
-            type="number"
-            placeholder="Stock Quantity"
-            value={editMedication.stock_quantity}
-            onChange={(e) => handleEditChange(e, "stock_quantity")}
           />
           <div className="flex gap-2">
             <Button onClick={handleSave}>Save</Button>
@@ -313,13 +280,6 @@ export default function MedicationManagement() {
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end space-x-2">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => handleIncreaseStock(medication)}
-                    >
-                      <ShoppingCart className="h-4 w-4 text-blue-600" />
-                    </Button>
                     <Button
                       variant="outline"
                       size="icon"
