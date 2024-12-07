@@ -20,7 +20,7 @@ import Link from "next/link";
 import { Spinner } from "@/components/ui/spinner";
 
 function PatientLoginForm() {
-  const form = useForm({
+  const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
       email: "",
