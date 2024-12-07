@@ -8,7 +8,7 @@ export async function PUT(
   try {
     const data = await request.json();
     const updatedMedication = await prisma.medication.update({
-      where: { med_id: params.med_id },
+      where: { med_id: await params.med_id },
       data: {
         name: data.name,
         supplier: data.supplier,
@@ -32,7 +32,7 @@ export async function DELETE(
 ) {
   try {
     await prisma.medication.delete({
-      where: { med_id: params.med_id },
+      where: { med_id: await params.med_id },
     });
     return NextResponse.json({ message: "Medication deleted successfully" });
   } catch (error) {
