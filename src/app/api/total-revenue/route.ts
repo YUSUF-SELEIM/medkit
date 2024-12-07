@@ -4,6 +4,11 @@ import { prisma } from "../../../lib/prismaClient";
 export async function GET() {
   try {
     const medicationRevenues = await prisma.prescription_Medication.findMany({
+      where: {
+        Prescription: {
+          processed: true,
+        },
+      },
       include: {
         Medication: true,
       },
