@@ -14,11 +14,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const getUserName = () => "John Doe";
+interface User {
+  email: string;
+}
 
-export function Header() {
-  const userName = getUserName();
-
+export function Header({ user }: { user: User }) {
   return (
     <header className="flex items-center justify-end p-4 bg-background border-b">
       <div className="flex items-center space-x-4">
@@ -36,9 +36,8 @@ export function Header() {
           <DropdownMenuContent className="w-56" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{userName}</p>
                 <p className="text-xs leading-none text-muted-foreground">
-                  {userName.toLowerCase().replace(" ", ".")}@example.com
+                  {user.email}
                 </p>
               </div>
             </DropdownMenuLabel>
