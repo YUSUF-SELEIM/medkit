@@ -17,7 +17,7 @@ export default function Home() {
         <nav className="container mx-auto px-4 py-6">
           <div className="flex justify-between items-center">
             <div className="flex">
-              <img
+              <Image
                 src="/images/logo.png"
                 alt="Pharmacist"
                 className="h-8 w-8 mr-2"
@@ -150,7 +150,7 @@ export default function Home() {
                 <p>Phone: (123) 456-7890</p>
                 <p>Email: info@medkit.com</p>
               </div>
-              <img
+              <Image
                 src="/images/logo.png"
                 alt="Pharmacist"
                 className="mr-2 animate-heartbeat"
