@@ -31,7 +31,14 @@ export function PatientSidebar({
   return (
     <Sidebar className="w-64 border-r">
       <SidebarHeader className="p-4 border-b">
-        <h2 className="text-2xl font-bold">Patient</h2>
+        <div className="flex">
+          <img
+            src="/images/logo.png"
+            alt="Pharmacist"
+            className="h-8 w-8 mr-2"
+          />
+          <h2 className="text-2xl font-bold">Patient</h2>
+        </div>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
