@@ -11,6 +11,7 @@ import {
   SidebarMenuButton,
   SidebarHeader,
 } from "@/components/ui/sidebar";
+import Image from "next/image";
 
 interface PatientSidebarProps {
   activeTab: string;
@@ -32,7 +33,7 @@ export function PatientSidebar({
     <Sidebar className="w-64 border-r">
       <SidebarHeader className="p-4 border-b">
         <div className="flex">
-          <img
+          <Image
             src="/images/logo.png"
             alt="Pharmacist"
             className="h-8 w-8 mr-2"
