@@ -3,6 +3,7 @@ import { prisma } from "../../../../lib/prismaClient";
 
 export async function PUT(
   request: NextRequest,
+  response: NextResponse,
   context: { params: { id: string } }
 ) {
   try {
@@ -36,6 +37,7 @@ export async function PUT(
 
 export async function GET(
   request: NextRequest,
+  reponse: NextResponse,
   context: { params: { id: string } }
 ) {
   try {
