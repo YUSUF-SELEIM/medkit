@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -109,7 +110,7 @@ export function PharmacyDashboardMetrics() {
                       label
                     >
                       {monthlyRevenue?.medicationBreakdown?.map(
-                        (entry, index) => (
+                        (entry: any, index: number) => (
                           <Cell
                             key={`cell-${index}`}
                             fill={`hsl(210, 70%, ${50 + index * 10}%)`}
