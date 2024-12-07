@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Patient {
+  id           String         @id @default(uuid())
+  name         String
+  email        String         @unique
+  password     String
+  DOB          DateTime
+  Prescription Prescription[]
+}
+
+model Pharmacist {
+  id           String         @id @default(uuid())
+  email        String         @unique
+  password     String
+  Order        Order[]
+  Prescription Prescription[]
+}
+
+model Order {
+  order_id                String                    @id @default(uuid())
+  order_date              DateTime                  @default(now())
+  status                  String
+  pharmacist_id           String
+  supplier                String
+  Medication_Order_Detail Medication_Order_Detail[]
+  Pharmacist              Pharmacist                @relation(fields: [pharmacist_id], references: [id])
+}
+
+model Medication_Order_Detail {
+  order_id         String
+  med_id           String
+  ordered_quantity Int
+  Medication       Medication @relation(fields: [med_id], references: [med_id])
+  Order            Order      @relation(fields: [order_id], references: [order_id])
+
+  @@id([order_id, med_id])
+}
+
+model Prescription {
+  prescription_id         String                    @id @default(uuid())
+  patient_id              String
+  pharmacist_id           String
+  processed               Boolean                   @default(false)
+  issue_date              DateTime                  @default(now())
+  end_date                DateTime
+  Patient                 Patient                   @relation(fields: [patient_id], references: [id])
+  Pharmacist              Pharmacist                @relation(fields: [pharmacist_id], references: [id])
+  Prescription_Medication Prescription_Medication[]
+}
+
+model Medication {
+  med_id                  String                    @id @default(uuid())
+  name                    String
+  supplier                String
+  price                   Decimal                   @db.Decimal(10, 2)
+  stock_quantity          Int
+  Medication_Order_Detail Medication_Order_Detail[]
+  Prescription_Medication Prescription_Medication[]
+}
+
+model Prescription_Medication {
+  prescription_id String
+  med_id          String
+  dosage          String
+  quantity        Int
+  Medication      Medication   @relation(fields: [med_id], references: [med_id])
+  Prescription    Prescription @relation(fields: [prescription_id], references: [prescription_id])
+
+  @@id([prescription_id, med_id])
+}
