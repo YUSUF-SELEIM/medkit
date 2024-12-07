@@ -87,7 +87,7 @@ export function PharmacyDashboardMetrics() {
         </CardHeader>
         <CardContent>
           {loadingRevenue ? (
-            <Spinner className="mx-auto w-12 h-12 mt-24" />
+            <Spinner className="mx-auto w-12 h-12 mt-40" />
           ) : (
             <>
               <div className="text-2xl font-bold">
