@@ -1,15 +1,15 @@
-import { NextResponse, NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "../../../../lib/prismaClient";
 
 export async function PUT(
   request: NextRequest,
-  reponse: NextResponse,
-  { params }: { params: { id: string } }
+  context: { params: { med_id: string } }
 ) {
   try {
+    const params = await context.params;
     const data = await request.json();
     const updatedMedication = await prisma.medication.update({
-      where: { med_id: await params.id },
+      where: { med_id: params.med_id },
       data: {
         name: data.name,
         supplier: data.supplier,
@@ -29,12 +29,12 @@ export async function PUT(
 
 export async function DELETE(
   _request: NextRequest,
-  _response: NextResponse,
-  { params }: { params: { id: string } }
+  context: { params: { med_id: string } }
 ) {
   try {
+    const params = await context.params;
     await prisma.medication.delete({
-      where: { med_id: await params.id },
+      where: { med_id: params.med_id },
     });
     return NextResponse.json({ message: "Medication deleted successfully" });
   } catch (error) {
