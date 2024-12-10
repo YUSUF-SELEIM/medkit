@@ -38,6 +38,8 @@ export function PharmacistSidebar({
           <Image
             src="/images/logo.png"
             alt="Pharmacist"
+            width={32}
+            height={32}
             className="h-8 w-8 mr-2"
           />
           <h2 className="text-2xl font-bold">Pharmacist</h2>

@@ -20,6 +20,8 @@ export default function Home() {
               <Image
                 src="/images/logo.png"
                 alt="Pharmacist"
+                width={32}
+                height={32}
                 className="h-8 w-8 mr-2"
               />
               <Link href="/" className="text-2xl font-bold">
@@ -152,6 +154,8 @@ export default function Home() {
               </div>
               <Image
                 src="/images/logo.png"
+                width={32}
+                height={32}
                 alt="Pharmacist"
                 className="mr-2 animate-heartbeat"
               />
