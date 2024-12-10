@@ -3,13 +3,12 @@ import { prisma } from "../../../../lib/prismaClient";
 
 export async function PUT(
   request: NextRequest,
-  response: NextResponse,
   context: { params: { id: string } }
 ) {
   try {
-    // Destructure params from context
-    const params = await context.params;
-    const { id } = params;
+    // Directly destructure id from context.params
+    const { id } = context.params;
+
     // Parse the request body
     const data = await request.json();
 
@@ -37,13 +36,12 @@ export async function PUT(
 
 export async function GET(
   request: NextRequest,
-  reponse: NextResponse,
   context: { params: { id: string } }
 ) {
   try {
-    const params = await context.params;
-    const { id } = params;
-    
+    // Directly destructure id from context.params
+    const { id } = context.params;
+
     const order = await prisma.order.findUnique({
       where: { order_id: id },
       include: {
