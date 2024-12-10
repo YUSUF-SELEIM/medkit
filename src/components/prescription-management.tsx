@@ -41,7 +41,7 @@ export default function PrescriptionsManagement() {
     useState<Prescription | null>(null);
   const [isProcessingDialog, setIsProcessingDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isAccepting, setIsAccepting] = useState(true);
+  const [isAccepting, setIsAccepting] = useState(false);
 
   // Fetch pending prescriptions
   const fetchPendingPrescriptions = async () => {
@@ -66,7 +66,7 @@ export default function PrescriptionsManagement() {
   // Handle prescription acceptance
   const handleAcceptPrescription = async () => {
     if (!selectedPrescription) return;
-
+    setIsAccepting(true);
     try {
       const response = await fetch("/api/pharmacist/process-prescription", {
         method: "POST",
