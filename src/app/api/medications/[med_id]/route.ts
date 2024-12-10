@@ -3,13 +3,13 @@ import { prisma } from "../../../../lib/prismaClient";
 
 export async function PUT(
   request: NextRequest,
-  context: { params: { med_id: string } }
+  { params }: { params: Promise<{ med_id: string }> }
 ) {
   try {
-    const params = await context.params;
     const data = await request.json();
+    const { med_id } = await params;
     const updatedMedication = await prisma.medication.update({
-      where: { med_id: params.med_id },
+      where: { med_id: med_id },
       data: {
         name: data.name,
         supplier: data.supplier,
@@ -29,12 +29,12 @@ export async function PUT(
 
 export async function DELETE(
   _request: NextRequest,
-  context: { params: { med_id: string } }
+  { params }: { params: Promise<{ med_id: string }> }
 ) {
   try {
-    const params = await context.params;
+    const { med_id } = await params;
     await prisma.medication.delete({
-      where: { med_id: params.med_id },
+      where: { med_id: med_id },
     });
     return NextResponse.json({ message: "Medication deleted successfully" });
   } catch (error) {

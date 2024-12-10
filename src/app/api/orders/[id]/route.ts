@@ -3,14 +3,12 @@ import { prisma } from "../../../../lib/prismaClient";
 
 export async function PUT(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Directly destructure id from context.params
-    const { id } = context.params;
-
     // Parse the request body
     const data = await request.json();
+    const { id } = await params;
 
     // Update order
     const updatedOrder = await prisma.order.update({
@@ -36,11 +34,11 @@ export async function PUT(
 
 export async function GET(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Directly destructure id from context.params
-    const { id } = context.params;
+    const { id } = await params;
 
     const order = await prisma.order.findUnique({
       where: { order_id: id },
