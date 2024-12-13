@@ -12,6 +12,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarHeader,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import Image from "next/image";
 
@@ -35,6 +36,7 @@ export function PharmacistSidebar({
     <Sidebar className="w-64 border-r">
       <SidebarHeader className="p-4 border-b flex">
         <div className="flex">
+          <SidebarTrigger className="mr-2 md:hidden " />
           <Image
             src="/images/logo.png"
             alt="Pharmacist"
