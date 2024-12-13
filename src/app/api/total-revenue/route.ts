@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { prisma } from "../../../lib/prismaClient";
-
 export async function GET() {
   try {
     const medicationRevenues = await prisma.prescription_Medication.findMany({
@@ -14,9 +13,23 @@ export async function GET() {
       },
     });
 
-    const medicationBreakdown = medicationRevenues.map((med) => ({
-      name: med.Medication.name,
-      revenue: Number(med.Medication.price) * med.quantity,
+    // Aggregate revenue by medication name
+    const revenueMap = new Map<string, number>();
+
+    for (const med of medicationRevenues) {
+      const name = med.Medication.name;
+      const revenue = Number(med.Medication.price) * med.quantity;
+
+      if (revenueMap.has(name)) {
+        revenueMap.set(name, revenueMap.get(name)! + revenue);
+      } else {
+        revenueMap.set(name, revenue);
+      }
+    }
+
+    const medicationBreakdown = Array.from(revenueMap, ([name, revenue]) => ({
+      name,
+      revenue,
     }));
 
     const totalRevenue = medicationBreakdown.reduce(
