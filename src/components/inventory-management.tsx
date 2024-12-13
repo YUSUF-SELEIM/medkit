@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/dialog";
 import { Edit, Trash2, Plus } from "lucide-react";
 import { Spinner } from "./ui/spinner";
+import { Toaster } from "./ui/toaster";
+import { toast } from "@/hooks/use-toast";
 
 type Medication = {
   med_id: string;
@@ -66,15 +68,37 @@ export default function MedicationManagement() {
 
   // Handle delete action
   const handleDelete = async (med_id: string) => {
+    // Find the medication to check its stock quantity
+    const medicationToDelete = medications.find((med) => med.med_id === med_id);
+
+    // If medication has stock, show a toast and prevent deletion
+    if (medicationToDelete && medicationToDelete.stock_quantity > 0) {
+      toast({
+        variant: "destructive",
+        title: "Cannot Delete Medication",
+        description: "Medication still has stock.",
+      });
+      return;
+    }
+
     try {
       const response = await fetch(`/api/medications/${med_id}`, {
         method: "DELETE",
       });
       if (response.ok) {
         setMedications(medications.filter((med) => med.med_id !== med_id));
+        toast({
+          title: "Medication Deleted",
+          description: "Medication was successfully removed.",
+        });
       }
     } catch (error) {
       console.error("Failed to delete medication:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete medication",
+      });
     }
   };
 
@@ -301,6 +325,7 @@ export default function MedicationManagement() {
           </TableBody>
         </Table>
       </div>
+      <Toaster />
     </div>
   );
 }
