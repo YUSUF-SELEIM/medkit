@@ -6,7 +6,7 @@ import { PharmacyDashboardMetrics } from "@/components/pharmacy-dashboard-metric
 import InventoryManagement from "@/components/inventory-management";
 import OrdersManagement from "@/components/order-management";
 import PrescriptionsManagement from "@/components/prescription-management";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 function PharmacistDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -16,6 +16,7 @@ function PharmacistDashboard() {
       <div className="flex flex-col h-screen md:flex-row w-full">
         <PharmacistSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         <SidebarInset className="flex-1">
+          <SidebarTrigger className="mr-2 md:hidden " />
           <main className="flex-1 p-6">
             {activeTab === "dashboard" && <PharmacyDashboardMetrics />}
             {activeTab === "inventory" && <InventoryManagement />}
