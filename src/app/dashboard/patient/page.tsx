@@ -6,7 +6,11 @@ import { CurrentPrescriptions } from "@/components/current-prescriptions";
 import { MedicationHistory } from "@/components/medication-history";
 import { PendingPrescriptions } from "@/components/pending-prescriptions";
 import { HealthMetrics } from "@/components/health-metrics";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 
 function PatientDashboard() {
   const [activeTab, setActiveTab] = useState("Prescriptions");
@@ -16,6 +20,7 @@ function PatientDashboard() {
       <div className="flex flex-col h-screen md:flex-row w-full">
         <PatientSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         <SidebarInset className="flex-1">
+          <SidebarTrigger className="mr-2 md:hidden " />
           <main className="flex-1 p-6">
             {activeTab === "Prescriptions" && <CurrentPrescriptions />}
             {activeTab === "History" && <MedicationHistory />}
@@ -27,4 +32,5 @@ function PatientDashboard() {
     </SidebarProvider>
   );
 }
+
 export default PatientDashboard;
