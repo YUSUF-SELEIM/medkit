@@ -40,7 +40,9 @@ export async function GET() {
     return NextResponse.json({
       totalRevenue: totalRevenue,
       medicationBreakdown: medicationBreakdown,
-      salesData: [{ name: "Total", sales: Number(totalRevenue.toFixed(2)) }],
+      salesData: [
+        { name: "Total", sales: Number(totalRevenue.toFixed(2) || "2") },
+      ],
     });
   } catch (error) {
     // More detailed error logging
